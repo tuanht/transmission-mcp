@@ -1,0 +1,31 @@
+services:
+  transmission-mcp:
+    build:
+      context: .
+      dockerfile: Containerfile
+    ports:
+      - "127.0.0.1:${MCP_PORT:-8650}:8650"
+    environment:
+      TRANSMISSION_URL: ${TRANSMISSION_URL:-http://transmission:9091/transmission/rpc}
+      TRANSMISSION_USER: ${TRANSMISSION_USER:-}
+      TRANSMISSION_PASSWORD: ${TRANSMISSION_PASSWORD:-}
+    restart: unless-stopped
+
+  # Bundled Transmission daemon for trying the MCP server end to end.
+  # Skipped by default; enable with `docker compose --profile transmission up`.
+  # Remove it and set TRANSMISSION_URL if you already run Transmission.
+  transmission:
+    profiles: ["transmission"]
+    image: lscr.io/linuxserver/transmission:latest
+    environment:
+      PUID: 1000
+      PGID: 1000
+    ports:
+      - "127.0.0.1:9091:9091"
+    volumes:
+      - transmission-config:/config
+      - ./downloads:/downloads
+    restart: unless-stopped
+
+volumes:
+  transmission-config:

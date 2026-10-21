@@ -16,11 +16,44 @@ Transmission and check whether they are downloading.
 | `TRANSMISSION_USER` / `TRANSMISSION_PASSWORD` | unset (no auth) |
 | `MCP_HOST` / `MCP_PORT` | `0.0.0.0` / `8650` |
 
+## Quick start
+
+Both methods serve the MCP endpoint at `http://127.0.0.1:8650/mcp`. You need a reachable
+Transmission RPC endpoint (set `TRANSMISSION_URL`); `.env.example` lists the variables.
+
+### Option 1: Docker Compose
+
+    cp .env.example .env            # edit TRANSMISSION_URL / credentials
+    docker compose up --build
+
+No Transmission yet? Start a bundled one alongside (web UI on http://127.0.0.1:9091,
+downloads in `./downloads`):
+
+    docker compose --profile transmission up --build
+
+With the bundled daemon, set `TRANSMISSION_URL=http://transmission:9091/transmission/rpc`
+(the default).
+
+### Option 2: Run Python directly
+
+Requires Python 3.11+.
+
+With [uv](https://docs.astral.sh/uv/):
+
+    uv sync
+    TRANSMISSION_URL=http://127.0.0.1:9091/transmission/rpc uv run transmission-mcp
+
+With plain pip:
+
+    python -m venv .venv && . .venv/bin/activate
+    pip install .
+    TRANSMISSION_URL=http://127.0.0.1:9091/transmission/rpc transmission-mcp
+
 ## Develop
     uv sync && uv run pytest
     uv run transmission-mcp
 
-## Container
+## Container (Podman)
     podman build -t localhost/transmission-mcp:latest .
 
 The Quadlet unit lives in the `hermes-desktop` repo (`quadlet/transmission-mcp.container`), joins the
